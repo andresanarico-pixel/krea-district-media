@@ -195,9 +195,49 @@ def reel11(t):
         cta_dm(c, t, 13.2); c.wipe(t, 13.2)
     return c.finish()
 
+
+# ---------------------------------------------------------------- 12-14 (factory)
+def beat_reel(beats, closing):
+    n = len(beats); T = n * 2.7
+    def fn(t):
+        c = D()
+        if t < T:
+            i = min(int(t // 2.7), n - 1); tt = t - i * 2.7
+            q, ans = beats[i]
+            c.text(q[0], 540, 640, 88 * pop(tt, 0), WHITE); c.text(q[1], 540, 760, 88 * pop(tt, 0.1), WHITE)
+            a = prog(tt, 1.1, 1.6)
+            if a > 0:
+                y = 1080 + 80 * (1 - eo(a))
+                c.circle(540, 960, 52 * eb(a), GOLD)
+                check(c, 540, 962, 46 * eb(a), BG, 10)
+                c.text(ans, 540, y + 60, 96 * pop(tt, 1.1), mix(GOLD, eo(a)))
+            for k in range(1, n):
+                c.wipe(t, k * 2.7)
+            c.wipe(t, T)
+        elif t < T + 2.4:
+            tt = t - T
+            c.text(closing[0], 540, 780, 100 * pop(tt, 0), WHITE)
+            c.text(closing[1], 540, 910, 100 * pop(tt, 0.3), GOLD if tt > 0.3 else BG)
+            c.wipe(t, T); c.wipe(t, T + 2.4)
+        else:
+            cta_dm(c, t, T + 2.4); c.wipe(t, T + 2.4)
+        return c.finish()
+    return fn, T + 2.4 + 3.6
+
+BEATS3 = [(["Amministratore", "di condominio?"], "Assemblee in sala."), (["Agente", "immobiliare?"], "Clienti a casa tua."),
+          (["Commercialista", "o notaio?"], "Studio, non affitto."), (["Libero", "professionista?"], "Scrivania vera.")]
+BEATS4 = [(["Utenze", "a parte?"], "Tutto incluso."), (["Deposito", "cauzionale?"], "Nessuno."),
+          (["Costi fissi", "da ufficio?"], "Un solo canone.")]
+BEATS5 = [(["Società senza", "una sede?"], "Sede legale."), (["Domenica sera,", "scadenza lunedì?"], "Aperto 24/7."),
+          (["Riunione", "a sorpresa?"], "Sala da 8.")]
+_r12 = beat_reel(BEATS3, ("C'è un posto", "per te.")); _r13 = beat_reel(BEATS4, ("Meno pensieri,", "più lavoro.")); _r14 = beat_reel(BEATS5, ("Un problema,", "una soluzione."))
+reel12, reel13, reel14 = _r12[0], _r13[0], _r14[0]
+
 REELS = {"7": (reel7, 16.4, "motion_7_perche_coworking"), "8": (reel8, 15.6, "motion_8_cliente_alle_18"),
          "9": (reel9, 14.6, "motion_9_per_chi_e"), "10": (reel10, 16.8, "motion_10_hai_bisogno_noi_ci_siamo"),
-         "11": (reel11, 16.8, "motion_11_un_problema_una_soluzione")}
+         "11": (reel11, 16.8, "motion_11_un_problema_una_soluzione"),
+         "12": (reel12, _r12[1], "motion_12_per_chi_e_krea"), "13": (reel13, _r13[1], "motion_13_costi_fissi"),
+         "14": (reel14, _r14[1], "motion_14_sede_domenica_sala")}
 
 if __name__ == "__main__":
     fn, dur, name = REELS[sys.argv[1]]

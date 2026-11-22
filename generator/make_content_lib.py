@@ -1,7 +1,7 @@
 import os, subprocess, sys
 from PIL import Image, ImageDraw, ImageFont
 
-ROOT = "/home/claude/social"
+ROOT = os.environ.get("KREA_ROOT", "/home/claude/social")
 OUT = f"{ROOT}/out"
 os.makedirs(f"{OUT}/stories", exist_ok=True)
 os.makedirs(f"{OUT}/posts", exist_ok=True)
