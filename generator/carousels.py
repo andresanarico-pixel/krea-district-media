@@ -20,9 +20,20 @@ CARS = {
   dict(kicker="4 / 4", headline=[("Di giorno e di sera.", WHITE)], sub="Con accesso 24/7, su prenotazione.", y0=560, hsize=84),
   dict(kicker="DAL 20 GENNAIO 2027", headline=[("Scrivici in DM.", GOLD)], sub="info@kreadistrict.it", footer=CONTACT, y0=600, hsize=96),
  ],
+ "car_postazione": [
+  dict(kicker="POSTAZIONE IN OPEN SPACE", headline=[("Per quanto ti serve una scrivania?", WHITE)], sub="Scorri di lato", y0=560, hsize=78),
+  dict(kicker="A ORE", headline=[("Un paio d'ore tra un appuntamento e l'altro.", WHITE)], sub="Arrivi, lavori, riparti.", y0=560, hsize=74),
+  dict(kicker="A GIORNATA", headline=[("Una giornata intera di concentrazione.", WHITE)], sub="Una scrivania vera, lontano dalle distrazioni di casa.", y0=560, hsize=78),
+  dict(kicker="PER PIÙ MESI", headline=[("Il tuo posto fisso, senza un ufficio da gestire.", WHITE)], sub="Canone tutto incluso, nessun deposito cauzionale.", y0=560, hsize=74),
+  dict(kicker="DAL 20 GENNAIO 2027", headline=[("Scrivici in DM.", GOLD)], sub="info@kreadistrict.it", footer=CONTACT, y0=600, hsize=96),
+ ],
 }
 for name, slides in CARS.items():
     os.makedirs(f"{OUT}/posts", exist_ok=True)
     for i, s in enumerate(slides, 1):
         scene(1080, 1350, 600, 50, **s).save(f"{OUT}/posts/{name}_{i}.png")
 print("ok")
+
+from make_content_lib import scene as _sc
+_sc(1080, 1920, 760, 110, kicker="POSTAZIONE IN OPEN SPACE", headline=[("Per quanto ti serve", WHITE), ("una scrivania?", GOLD)],
+    bullets=["A ore", "A giornata", "Per più mesi"], sub="Rispondi a questa storia o scrivici in DM.", footer=CONTACT[:1], y0=800, hsize=84).save(f"{OUT}/stories/story_postazione.png")
