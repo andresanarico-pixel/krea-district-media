@@ -233,11 +233,66 @@ BEATS5 = [(["Società senza", "una sede?"], "Sede legale."), (["Domenica sera,",
 _r12 = beat_reel(BEATS3, ("C'è un posto", "per te.")); _r13 = beat_reel(BEATS4, ("Meno pensieri,", "più lavoro.")); _r14 = beat_reel(BEATS5, ("Un problema,", "una soluzione."))
 reel12, reel13, reel14 = _r12[0], _r13[0], _r14[0]
 
+# ---------------------------------------------------------------- 15: postazione a ore / giornata / mesi
+def reel15(t):
+    c = D()
+    if t < 2.4:
+        c.text("Ti serve", 540, 770, 140 * pop(t, 0), WHITE); c.text("una scrivania?", 540, 930, 118 * pop(t, 0.2), GOLD)
+        c.rect(190, 1060, 190 + 700 * eo((t - 0.5) / 0.8), 1070, GOLD)
+        c.wipe(t, 2.4)
+    elif t < 7.2:
+        tt = t - 2.4
+        c.text("Per quanto?", 540, 400, 100 * pop(tt, 0), WHITE)
+        c.text("Scegli tu.", 540, 520, 64, mix(GOLD, eo(prog(tt, 0.3, 0.8))))
+        for i, it in enumerate(["Qualche ora", "Una giornata", "Più mesi"]):
+            pill(c, 760 + i * 190, it, prog(tt, 0.8 + i * 0.75, 1.2 + i * 0.75), 400, 72, 56)
+        c.wipe(t, 2.4); c.wipe(t, 7.2)
+    elif t < 11.0:
+        tt = t - 7.2
+        c.text("Postazione in open space.", 540, 420, 62, GOLD)
+        for i, it in enumerate(["Canone tutto incluso", "Nessun deposito cauzionale", "Accesso 24/7"]):
+            a = prog(tt, 0.4 + i * 0.6, 0.8 + i * 0.6); y = 660 + i * 170
+            if a > 0:
+                check(c, 150, y, 50 * eb(a)); c.text(it, 230, y, 54, mix(WHITE, eo(a)), True, "lm")
+        c.wipe(t, 7.2); c.wipe(t, 11.0)
+    elif t < 13.2:
+        tt = t - 11.0
+        c.text("Arrivi. Ti siedi.", 540, 790, 96 * pop(tt, 0), WHITE); c.text("Lavori.", 540, 940, 130 * pop(tt, 0.35), GOLD if tt > 0.35 else BG)
+        c.wipe(t, 11.0); c.wipe(t, 13.2)
+    else:
+        cta_dm(c, t, 13.2); c.wipe(t, 13.2)
+    return c.finish()
+
+# ---------------------------------------------------------------- 16: a cosa serve la sala riunioni
+def reel16(t):
+    c = D()
+    if t < 2.4:
+        c.text("Sala riunioni.", 540, 770, 128 * pop(t, 0), WHITE); c.text("Fino a 8 persone.", 540, 930, 100 * pop(t, 0.2), GOLD)
+        c.wipe(t, 2.4)
+    elif t < 7.6:
+        tt = t - 2.4
+        c.text("Per cosa la usi?", 540, 380, 90 * pop(tt, 0), GOLD)
+        for i, it in enumerate(["Assemblee di condominio", "Incontri con i clienti", "Consulenze", "Colloqui"]):
+            a = prog(tt, 0.5 + i * 0.7, 0.9 + i * 0.7); y = 620 + i * 165
+            if a > 0:
+                check(c, 150, y, 50 * eb(a)); c.text(it, 230, y, 56, mix(WHITE, eo(a)), True, "lm")
+        c.wipe(t, 2.4); c.wipe(t, 7.6)
+    elif t < 11.8:
+        tt = t - 7.6
+        c.text("Per quanto tempo?", 540, 400, 84 * pop(tt, 0), WHITE)
+        for i, it in enumerate(["A ore", "Mezza giornata", "Una giornata", "Anche di sera"]):
+            pill(c, 640 + i * 165, it, prog(tt, 0.4 + i * 0.6, 0.75 + i * 0.6), 380, 64, 50)
+        c.wipe(t, 7.6); c.wipe(t, 11.8)
+    else:
+        cta_dm(c, t, 11.8); c.wipe(t, 11.8)
+    return c.finish()
+
 REELS = {"7": (reel7, 16.4, "motion_7_perche_coworking"), "8": (reel8, 15.6, "motion_8_cliente_alle_18"),
          "9": (reel9, 14.6, "motion_9_per_chi_e"), "10": (reel10, 16.8, "motion_10_hai_bisogno_noi_ci_siamo"),
          "11": (reel11, 16.8, "motion_11_un_problema_una_soluzione"),
          "12": (reel12, _r12[1], "motion_12_per_chi_e_krea"), "13": (reel13, _r13[1], "motion_13_costi_fissi"),
-         "14": (reel14, _r14[1], "motion_14_sede_domenica_sala")}
+         "14": (reel14, _r14[1], "motion_14_sede_domenica_sala"),
+         "15": (reel15, 16.8, "motion_15_scrivania_quando_vuoi"), "16": (reel16, 15.4, "motion_16_sala_per_cosa")}
 
 if __name__ == "__main__":
     fn, dur, name = REELS[sys.argv[1]]
