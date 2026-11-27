@@ -61,10 +61,14 @@ sub = crop[gbox[1]:gbox[3], gbox[0]:gbox[2]]
 dark = (sub.max(axis=2) < 105) & (mask[gbox[1]:gbox[3], gbox[0]:gbox[2]] > 40)
 gl[gbox[1]:gbox[3], gbox[0]:gbox[2]] = dark * 255
 gl = cv2.dilate(gl, np.ones((5, 5), np.uint8))
-noglass = cv2.inpaint(crop, gl, 5, cv2.INPAINT_TELEA)
+noglass = cv2.inpaint(crop, cv2.dilate(gl, np.ones((11, 11), np.uint8)), 7, cv2.INPAINT_TELEA)
 gsoft = cv2.GaussianBlur(gl, (3, 3), 0).astype(np.float32)
 base = np.zeros((CH + PAD, CW + 2 * PAD, 4), np.float32)
-base[PAD:, PAD:PAD + CW, :3] = noglass; base[PAD:, PAD:PAD + CW, 3] = cv2.GaussianBlur(mask, (3, 3), 0)
+alpha0 = cv2.GaussianBlur(mask, (3, 3), 0).astype(np.float32)
+_yy, _xx = np.mgrid[0:CH, 0:CW]
+_head = np.clip((77 - np.hypot(_xx - 210, _yy - 166)) / 2 + 0.5, 0, 1)      # profilo tondo della testa: via la sagoma degli occhiali che sporge
+alpha0[:122] *= np.where(cv2.dilate(gl, np.ones((9, 9), np.uint8))[:122] > 0, _head[:122], 1)
+base[PAD:, PAD:PAD + CW, :3] = noglass; base[PAD:, PAD:PAD + CW, 3] = alpha0
 LH, LW = base.shape[:2]
 piv = (PAD + 230, PAD + 800)
 yy, xx = np.mgrid[0:LH, 0:LW].astype(np.float32)
@@ -79,6 +83,7 @@ def layer(g):
     c[PAD + dy:PAD + dy + CH - dy, PAD + dx:PAD + dx + CW - dx] = crop[:CH - dy, :CW - dx]
     a = a[:, :, None]
     L[:, :, :3] = L[:, :, :3] * (1 - a) + c * a
+    L[:, :, 3] = np.maximum(L[:, :, 3], a[:, :, 0] * 255)   # gli occhiali portano la propria sagoma
     return L
 
 # luci albero
@@ -151,7 +156,7 @@ def compose(t, s, texts, bot):
     shc = (int((x0 + 215 + X) * sc), int((y0 + 795) * sc))
     sh = np.zeros((PH, W), np.float32)
     k = 1 - min(1, abs(hop) / 60) * 0.35
-    cv2.ellipse(sh, shc, (int(175 * k), int(40 * k)), 0, 0, 360, 0.42 * k * (1 - 0.5 * dk), -1)
+    cv2.ellipse(sh, shc, (int(175 * k), int(40 * k)), 0, 0, 360, 0.42 * k * (1 - 0.5 * dk) * (1 - g("noshadow")), -1)
     sh = cv2.GaussianBlur(sh, (0, 0), 22)[:, :, None]
     ph *= (1 - sh)
     Ls = cv2.resize(L, (round(LW * sc), round(LH * sc)), interpolation=cv2.INTER_AREA)
